@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Royal Bakery KVSAS - Portal Akses Pelajar & Pemantauan Guru</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        kvblue: '#0f172a',
+                        kvorange: '#e85527',
+                        problue: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #f8fafc;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .pro-card {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.03), 0 1px 2px -1px rgba(15, 23, 42, 0.03);
+            transition: all 0.2s ease-in-out;
+        }
+        .pro-card:hover {
+            border-color: #cbd5e1;
+        }
+
+        .pro-table-header {
+            background-color: #f1f5f9;
+            color: #475569;
+            text-transform: uppercase;
+            font-size: 0.70rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+
+        /* Excel Sheet Specific Styling */
+        .excel-table {
+            border-collapse: separate;
+            border-spacing: 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+        }
+        .excel-table th, .excel-table td {
+            border-right: 1px solid #cbd5e1;
+            border-bottom: 1px solid #cbd5e1;
+            padding: 6px 10px;
+            white-space: nowrap;
+        }
+        .excel-table th {
+            background-color: #e2e8f0;
+            color: #334155;
+            font-weight: 700;
+            text-align: center;
+            user-select: none;
+        }
+        .excel-table tr:hover td {
+            background-color: #f0fdf4 !important;
+        }
+        .excel-header-row {
+            background-color: #f1f5f9;
+            color: #1e293b;
+        }
+        .excel-row-num {
+            background-color: #cbd5e1;
+            color: #475569;
+            font-weight: bold;
+            text-align: center;
+            width: 38px;
+            user-select: none;
+        }
+
+        /* Custom Scrollbar for tables */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Print Media Styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printable-area, #printable-area * {
+                visibility: visible;
+            }
+            #printable-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                background: white;
+                color: black;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col bg-slate-50 text-slate-900">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
+
+    <!-- Top Navigation Header -->
+    <header class="bg-slate-900 text-white shadow-md no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo & Title -->
+                <div class="flex items-center space-x-3">
+                    <!-- Royal Bakery KVSAS Logo Branding -->
+                    <div class="flex items-center justify-center bg-white px-2.5 py-1 rounded-md shadow-sm border border-slate-700 gap-2">
+                        <div class="w-8 h-8 rounded-full bg-amber-500 text-slate-900 flex items-center justify-center font-bold text-sm shadow-inner">
+                            <i class="fa-solid fa-crown text-amber-100"></i>
+                        </div>
+                        <div class="text-left">
+                            <span class="block text-xs font-black text-slate-900 leading-none tracking-wider">ROYAL BAKERY</span>
+                            <span class="block text-[9px] font-bold text-kvorange leading-tight">KV SULTAN ABDUL SAMAD</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h1 class="text-base font-bold leading-none text-white tracking-wide">ROYAL BAKERY KVSAS</h1>
+                        <span class="text-[11px] text-amber-400 font-medium">Portal Tempahan Pelajar & Pemantauan Produk Guru</span>
+                    </div>
+                </div>
+
+                <!-- Actions / Controls -->
+                <div class="flex items-center gap-3">
+                    <button id="btn-open-form-modal" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold py-2 px-3 rounded-md transition flex items-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-bread-slice"></i> Tempahan / Akses Pelajar
+                    </button>
+                    <button id="btn-add-row" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold py-2 px-3 rounded-md transition flex items-center gap-1.5 border border-slate-700">
+                        <i class="fa-solid fa-plus text-emerald-400"></i> Rekod Manual
+                    </button>
+                    <button id="btn-export-csv" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold py-2 px-3 rounded-md transition flex items-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-file-csv"></i> Eksport CSV
+                    </button>
+                    <button id="btn-print" class="bg-problue-600 hover:bg-problue-700 text-white text-xs font-semibold py-2 px-3 rounded-md transition flex items-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-print"></i> Cetak Laporan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col gap-6">
+
+        <!-- Banner Portal Pelajar & Guru -->
+        <div class="bg-gradient-to-r from-slate-900 via-problue-900 to-slate-900 text-white p-5 rounded-lg shadow-md flex flex-col md:flex-row items-center justify-between gap-4 no-print border border-slate-800">
+            <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                    <span class="bg-emerald-500/20 text-emerald-300 text-[10px] uppercase font-bold px-2 py-0.5 rounded border border-emerald-500/30">Google Form Connected</span>
+                    <span class="bg-amber-500/20 text-amber-300 text-[10px] uppercase font-bold px-2 py-0.5 rounded border border-amber-500/30"><i class="fa-solid fa-wheat-awn mr-1"></i>Royal Bakery KVSAS</span>
+                </div>
+                <h2 class="text-base font-bold">Portal Tempahan & Pengambilan Produk Bakeri KVSAS</h2>
+                <p class="text-xs text-slate-300">Pelajar dan warga KVSAS boleh membuat tempahan produk Royal Bakery secara digital. Guru/pengurus bakeri memantau, mengesahkan, dan mengurus status pesanan.</p>
+            </div>
+            <div class="flex gap-2 shrink-0">
+                <button id="btn-copy-form-link" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-2 rounded-md font-medium border border-slate-700 flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-link text-amber-400"></i> Salin Pautan Form Pelajar
+                </button>
+                <button id="btn-view-student-form" class="bg-emerald-600 hover:bg-emerald-500 text-xs px-3 py-2 rounded-md font-semibold flex items-center gap-1.5 transition shadow">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Borang Tempahan Bakeri
+                </button>
+            </div>
+        </div>
+
+        <!-- KPI Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 no-print">
+            <div class="pro-card p-4 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Jumlah Pesanan</p>
+                    <p id="kpi-revenue" class="text-xl font-bold text-slate-900 mt-1">0</p>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                    <i class="fa-solid fa-receipt"></i>
+                </div>
+            </div>
+
+            <div class="pro-card p-4 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Jumlah Pelajar / Pelanggan</p>
+                    <p id="kpi-orders" class="text-xl font-bold text-slate-900 mt-1">0</p>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-problue-100 text-problue-600 flex items-center justify-center">
+                    <i class="fa-solid fa-user-graduate"></i>
+                </div>
+            </div>
+
+            <div class="pro-card p-4 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Kuantiti Produk Diserah</p>
+                    <p id="kpi-avg" class="text-xl font-bold text-slate-900 mt-1">0 Unit</p>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center">
+                    <i class="fa-solid fa-cookie-bite"></i>
+                </div>
+            </div>
+
+            <div class="pro-card p-4 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Pesanan Belum Disah</p>
+                    <p id="kpi-pending" class="text-xl font-bold text-slate-900 mt-1">0</p>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                    <i class="fa-solid fa-hourglass-half"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Bar & Search Container -->
+        <div class="pro-card p-4 no-print flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div class="relative w-full md:w-80">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                <input type="text" id="search-input" placeholder="Cari nama pelajar, ID, atau produk bakeri..." class="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-problue-500 focus:border-transparent">
+            </div>
+
+            <div class="flex items-center gap-3 w-full md:w-auto justify-end">
+                <div class="flex items-center gap-2">
+                    <label class="text-xs text-slate-500 font-medium">Status Pengambilan:</label>
+                    <select id="filter-status" class="bg-slate-50 border border-slate-300 text-xs rounded-md px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-problue-500">
+                        <option value="ALL">Semua Status</option>
+                        <option value="Disahkan">Disahkan / Sedia</option>
+                        <option value="Dalam Proses">Bakar / Dalam Proses</option>
+                        <option value="Pending">Menunggu Semakan</option>
+                        <option value="Ditolak">Ditolak / Batal</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <label class="text-xs text-slate-500 font-medium">Program / Kelas:</label>
+                    <select id="filter-region" class="bg-slate-50 border border-slate-300 text-xs rounded-md px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-problue-500">
+                        <option value="ALL">Semua Program</option>
+                        <option value="1 DVM BPP">1 DVM BPP</option>
+                        <option value="2 DVM BPP">2 DVM BPP</option>
+                        <option value="1 SVM BPP">1 SVM BPP</option>
+                        <option value="2 SVM BPP">2 SVM BPP</option>
+                        <option value="Staf / Guru">Staf / Guru KVSAS</option>
+                    </select>
+                </div>
+
+                <button id="btn-reset-filters" class="text-xs text-slate-500 hover:text-slate-800 underline ml-2">
+                    Reset
+                </button>
+            </div>
+        </div>
+
+        <!-- Printable & Interactive Table View -->
+        <div id="printable-area" class="pro-card flex-1 flex flex-col overflow-hidden bg-white">
+            
+            <!-- Report Title -->
+            <div class="p-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+                <div>
+                    <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-store text-amber-600"></i> Rekod Tempahan Royal Bakery KVSAS (Pemantauan Guru)
+                    </h2>
+                    <p class="text-xs text-slate-500">Data Terkini Pengeluaran & Agihan Produk Bakeri KVSAS</p>
+                </div>
+                <span id="record-count" class="text-xs font-mono bg-slate-200 text-slate-700 py-1 px-2.5 rounded">0 Rekod</span>
+            </div>
+
+            <!-- Spreadsheet Table Container -->
+            <div class="flex-1 overflow-auto p-2">
+                <table class="excel-table w-full">
+                    <thead>
+                        <tr>
+                            <th class="excel-row-num">#</th>
+                            <th>A</th>
+                            <th>B</th>
+                            <th>C</th>
+                            <th>D</th>
+                            <th>E</th>
+                            <th>F</th>
+                            <th>G</th>
+                            <th class="no-print">H</th>
+                        </tr>
+                        <tr class="excel-header-row">
+                            <th class="excel-row-num"><i class="fa-solid fa-hashtag text-[10px]"></i></th>
+                            <th class="text-left">ID Tempahan</th>
+                            <th class="text-left">Nama Pelajar / Pelanggan</th>
+                            <th class="text-left">Program / Kelas</th>
+                            <th class="text-left">Produk Royal Bakery</th>
+                            <th class="text-right">Kuantiti (Pek/Unit)</th>
+                            <th class="text-center">Status Semakan Guru</th>
+                            <th class="text-center">Tarikh Pengambilan</th>
+                            <th class="text-center no-print">Tindakan Guru</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <!-- Table rows populated dynamically via JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Table Footer Totals Bar -->
+            <div class="border-t border-slate-200 bg-slate-100 p-3 flex justify-between items-center font-mono text-xs text-slate-700">
+                <span>Mod Pemantauan Guru - Royal Bakery KVSAS</span>
+                <div class="flex gap-6">
+                    <span>Jumlah Produk Diagih: <strong id="footer-total" class="text-emerald-700">0 Unit</strong></span>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal: Google Form Viewer / Simulator Pelajar Royal Bakery -->
+    <div id="modal-google-form" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full overflow-hidden border border-slate-200 flex flex-col max-h-[90vh]">
+            <div class="bg-amber-600 text-white px-5 py-3.5 flex justify-between items-center shrink-0">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-wheat-awn text-lg"></i>
+                    <div>
+                        <h3 class="font-bold text-sm">Borang Tempahan Pelajar (Royal Bakery KVSAS)</h3>
+                        <p class="text-[10px] text-amber-100">Borang permohonan/tempahan produk bakeri secara atas talian</p>
+                    </div>
+                </div>
+                <button id="btn-close-form-modal" class="text-amber-100 hover:text-white text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <form id="student-google-form" class="p-6 overflow-y-auto space-y-4 text-xs">
+                <div class="bg-amber-50 border border-amber-200 p-3 rounded-lg text-amber-900 text-xs flex items-center gap-2">
+                    <i class="fa-solid fa-circle-info text-amber-600 text-base"></i> 
+                    <span>Sila isi maklumat anda untuk tempahan dan pengambilan produk di Bengkel Royal Bakery KVSAS.</span>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Nama Lengkap Pelajar / Pemohon <span class="text-red-500">*</span></label>
+                    <input type="text" id="gf-student-name" required placeholder="Contoh: Nur Aisyah Binti Zulkifli" class="w-full px-3 py-2 border border-slate-300 rounded focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Program / Kelas <span class="text-red-500">*</span></label>
+                        <select id="gf-class" class="w-full px-3 py-2 border border-slate-300 rounded focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                            <option value="1 DVM BPP">1 DVM BPP (Seni Kulinari/Bakeri)</option>
+                            <option value="2 DVM BPP">2 DVM BPP</option>
+                            <option value="1 SVM BPP">1 SVM BPP</option>
+                            <option value="2 SVM BPP">2 SVM BPP</option>
+                            <option value="Staf / Guru">Staf / Guru KVSAS</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Pilihan Produk Royal Bakery <span class="text-red-500">*</span></label>
+                        <select id="gf-material" class="w-full px-3 py-2 border border-slate-300 rounded focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                            <option value="Roti Manis Combo (Coklat/Kacang)">Roti Manis Combo (Coklat/Kacang)</option>
+                            <option value="Kek Coklat Moist Royal">Kek Coklat Moist Royal</option>
+                            <option value="Croissant Mentega (Pek 3 unit)">Croissant Mentega (Pek 3 unit)</option>
+                            <option value="Donut Gelek Gula (Pek 6 unit)">Donut Gelek Gula (Pek 6 unit)</option>
+                            <option value="Tarts Buah-Buahan Royal">Tarts Buah-Buahan Royal</option>
+                            <option value="Biskut Chocolate Chip (Balang)">Biskut Chocolate Chip (Balang)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Kuantiti (Pek / Unit) <span class="text-red-500">*</span></label>
+                        <input type="number" id="gf-quantity" min="1" max="20" value="1" required class="w-full px-3 py-2 border border-slate-300 rounded focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Tarikh Pengambilan Bengkel <span class="text-red-500">*</span></label>
+                        <input type="date" id="gf-date" required class="w-full px-3 py-2 border border-slate-300 rounded focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-200 flex justify-end gap-2">
+                    <button type="button" id="btn-cancel-form-modal" class="px-4 py-2 font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded">Batal</button>
+                    <button type="submit" class="px-5 py-2 font-semibold text-white bg-amber-600 hover:bg-amber-700 rounded shadow-md flex items-center gap-1">
+                        <i class="fa-solid fa-paper-plane"></i> Hantar Tempahan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Add New Entry (Manual Guru Royal Bakery) -->
+    <div id="modal-add" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full overflow-hidden border border-slate-200">
+            <div class="bg-slate-900 text-white px-5 py-4 flex justify-between items-center">
+                <h3 class="font-bold text-sm">Tambah Rekod Manual (Guru Bakeri)</h3>
+                <button id="btn-close-modal" class="text-slate-400 hover:text-white text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="add-form" class="p-5 space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Pemohon / Pelajar</label>
+                    <input type="text" id="input-customer" required class="w-full px-3 py-1.5 border border-slate-300 rounded text-xs focus:ring-2 focus:ring-problue-500 focus:outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Program / Kelas</label>
+                        <select id="input-region" class="w-full px-3 py-1.5 border border-slate-300 rounded text-xs focus:ring-2 focus:ring-problue-500 focus:outline-none">
+                            <option value="1 DVM BPP">1 DVM BPP</option>
+                            <option value="2 DVM BPP">2 DVM BPP</option>
+                            <option value="1 SVM BPP">1 SVM BPP</option>
+                            <option value="2 SVM BPP">2 SVM BPP</option>
+                            <option value="Staf / Guru">Staf / Guru</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Produk Royal Bakery</label>
+                        <select id="input-category" class="w-full px-3 py-1.5 border border-slate-300 rounded text-xs focus:ring-2 focus:ring-problue-500 focus:outline-none">
+                            <option value="Roti Manis Combo (Coklat/Kacang)">Roti Manis Combo</option>
+                            <option value="Kek Coklat Moist Royal">Kek Coklat Moist Royal</option>
+                            <option value="Croissant Mentega (Pek 3 unit)">Croissant Mentega</option>
+                            <option value="Donut Gelek Gula (Pek 6 unit)">Donut Gelek Gula</option>
+                            <option value="Biskut Chocolate Chip (Balang)">Biskut Chocolate Chip</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Kuantiti (Pek/Unit)</label>
+                        <input type="number" id="input-amount" value="1" min="1" required class="w-full px-3 py-1.5 border border-slate-300 rounded text-xs focus:ring-2 focus:ring-problue-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Status Tempahan</label>
+                        <select id="input-status" class="w-full px-3 py-1.5 border border-slate-300 rounded text-xs focus:ring-2 focus:ring-problue-500 focus:outline-none">
+                            <option value="Disahkan">Disahkan / Sedia</option>
+                            <option value="Dalam Proses">Dalam Proses Bakar</option>
+                            <option value="Pending">Menunggu Semakan</option>
+                            <option value="Ditolak">Ditolak / Batal</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="pt-3 flex justify-end gap-2 border-t border-slate-100">
+                    <button type="button" id="btn-cancel-modal" class="px-4 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded">Batal</button>
+                    <button type="submit" class="px-4 py-1.5 text-xs font-medium text-white bg-problue-600 hover:bg-problue-700 rounded shadow-md">Simpan Rekod</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Application Script Logic -->
+    <script>
+        // Initial Dataset (Khusus Produk Bakeri KVSAS)
+        let sampleData = [
+            { id: 'RB-2026-01', customer: 'Ahmad Danial Bin Razak', region: '2 DVM BPP', category: 'Roti Manis Combo (Coklat/Kacang)', amount: 3, status: 'Disahkan', date: '2026-10-28' },
+            { id: 'RB-2026-02', customer: 'Siti Nur Aishah', region: '1 DVM BPP', category: 'Kek Coklat Moist Royal', amount: 1, status: 'Disahkan', date: '2026-10-28' },
+            { id: 'RB-2026-03', customer: 'Lim Wei Jian', region: '2 SVM BPP', category: 'Croissant Mentega (Pek 3 unit)', amount: 2, status: 'Dalam Proses', date: '2026-10-29' },
+            { id: 'RB-2026-04', customer: 'Pn. Farah Hani (Guru)', region: 'Staf / Guru', category: 'Tarts Buah-Buahan Royal', amount: 5, status: 'Pending', date: '2026-10-29' },
+            { id: 'RB-2026-05', customer: 'Muhammad Amirul', region: '1 SVM BPP', category: 'Donut Gelek Gula (Pek 6 unit)', amount: 2, status: 'Disahkan', date: '2026-10-30' },
+            { id: 'RB-2026-06', customer: 'Kavitha Subramaniam', region: '2 DVM BPP', category: 'Biskut Chocolate Chip (Balang)', amount: 1, status: 'Ditolak', date: '2026-10-30' }
+        ];
+
+        // Format Utilities
+        const getStatusBadge = (status) => {
+            switch(status) {
+                case 'Disahkan':
+                    return `<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200"><i class="fa-solid fa-circle-check mr-1"></i>Disahkan</span>`;
+                case 'Dalam Proses':
+                    return `<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-100 text-blue-700 border border-blue-200"><i class="fa-solid fa-spinner mr-1"></i>Dalam Proses</span>`;
+                case 'Pending':
+                    return `<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-700 border border-amber-200"><i class="fa-solid fa-clock mr-1"></i>Menunggu</span>`;
+                case 'Ditolak':
+                    return `<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-100 text-rose-700 border border-rose-200"><i class="fa-solid fa-circle-xmark mr-1"></i>Ditolak</span>`;
+                default:
+                    return status;
+            }
+        };
+
+        // Render Functions
+        function renderTable() {
+            const tbody = document.getElementById('table-body');
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const filterStatus = document.getElementById('filter-status').value;
+            const filterRegion = document.getElementById('filter-region').value;
+
+            // Filter Dataset
+            const filteredData = sampleData.filter(item => {
+                const matchesSearch = item.customer.toLowerCase().includes(search) || 
+                                      item.id.toLowerCase().includes(search) ||
+                                      item.category.toLowerCase().includes(search);
+                const matchesStatus = filterStatus === 'ALL' || item.status === filterStatus;
+                const matchesRegion = filterRegion === 'ALL' || item.region === filterRegion;
+
+                return matchesSearch && matchesStatus && matchesRegion;
+            });
+
+            tbody.innerHTML = '';
+
+            if (filteredData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="text-center py-8 text-slate-400 italic">
+                            Tiada rekod pengambilan bahan dijumpai mengikut kriteria carian.
+                        </td>
+                    </tr>
+                `;
+            } else {
+                filteredData.forEach((row, index) => {
+                    const tr = document.createElement('tr');
+                    tr.className = index % 2 === 0 ? 'bg-white' : 'bg-slate-50/50';
+                    tr.innerHTML = `
+                        <td class="excel-row-num">${index + 1}</td>
+                        <td class="font-semibold text-slate-700">${row.id}</td>
+                        <td class="text-slate-900 font-medium">${row.customer}</td>
+                        <td>${row.region}</td>
+                        <td class="font-medium text-slate-800">${row.category}</td>
+                        <td class="text-right font-bold text-indigo-600">${row.amount} Unit</td>
+                        <td class="text-center">${getStatusBadge(row.status)}</td>
+                        <td class="text-center text-slate-500">${row.date}</td>
+                        <td class="text-center no-print">
+                            <div class="flex items-center justify-center gap-1">
+                                <button onclick="toggleVerifyStatus('${row.id}')" class="text-emerald-600 hover:text-emerald-800 p-1" title="Luluskan / Sahkan">
+                                    <i class="fa-solid fa-check"></i>
+                                </button>
+                                <button onclick="deleteRecord('${row.id}')" class="text-slate-400 hover:text-rose-600 p-1" title="Padam Rekod">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            // Update Summaries
+            updateKPIs(filteredData);
+        }
+
+        function updateKPIs(data) {
+            const totalQuantity = data.reduce((acc, curr) => curr.status !== 'Ditolak' ? acc + Number(curr.amount) : acc, 0);
+            const totalStudents = data.length;
+            const pendingOrders = data.filter(d => d.status === 'Pending' || d.status === 'Dalam Proses').length;
+
+            document.getElementById('kpi-revenue').textContent = totalStudents;
+            document.getElementById('kpi-orders').textContent = totalStudents;
+            document.getElementById('kpi-avg').textContent = `${totalQuantity} Unit`;
+            document.getElementById('kpi-pending').textContent = pendingOrders;
+            
+            document.getElementById('record-count').textContent = `${data.length} Rekod Permohonan`;
+            document.getElementById('footer-total').textContent = `${totalQuantity} Unit`;
+        }
+
+        // Actions Guru
+        function toggleVerifyStatus(id) {
+            const record = sampleData.find(item => item.id === id);
+            if (record) {
+                record.status = record.status === 'Disahkan' ? 'Pending' : 'Disahkan';
+                renderTable();
+                showToast(`Status permohonan ${record.id} dikemas kini kepada ${record.status}`);
+            }
+        }
+
+        function deleteRecord(id) {
+            sampleData = sampleData.filter(item => item.id !== id);
+            renderTable();
+            showToast('Rekod permohonan telah dipadam');
+        }
+
+        function exportCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "ID Permohonan,Nama Pelajar,Kelas,Bahan Diambil,Kuantiti,Status,Tarikh\n";
+
+            sampleData.forEach(row => {
+                csvContent += `"${row.id}","${row.customer}","${row.region}","${row.category}",${row.amount},"${row.status}","${row.date}"\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Laporan_Pengambilan_Bahan_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast('Fail CSV laporan berjaya dimuat turun');
+        }
+
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'bg-slate-900 text-white text-xs px-4 py-2.5 rounded shadow-lg flex items-center gap-2 border border-slate-700 transition-all duration-300';
+            toast.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> ${message}`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Event Listeners Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            // Set default date for student form to today
+            document.getElementById('gf-date').value = new Date().toISOString().slice(0, 10);
+
+            renderTable();
+
+            // Filters & Search
+            document.getElementById('search-input').addEventListener('input', renderTable);
+            document.getElementById('filter-status').addEventListener('change', renderTable);
+            document.getElementById('filter-region').addEventListener('change', renderTable);
+
+            document.getElementById('btn-reset-filters').addEventListener('click', () => {
+                document.getElementById('search-input').value = '';
+                document.getElementById('filter-status').value = 'ALL';
+                document.getElementById('filter-region').value = 'ALL';
+                renderTable();
+            });
+
+            // Action Buttons
+            document.getElementById('btn-print').addEventListener('click', () => {
+                window.print();
+            });
+
+            document.getElementById('btn-export-csv').addEventListener('click', exportCSV);
+
+            // Copy Link Google Form Pelajar
+            document.getElementById('btn-copy-form-link').addEventListener('click', () => {
+                const dummyLink = "https://forms.google.com/viewform?id=royal-bakery-kvsas-order";
+                const tempInput = document.createElement("input");
+                document.body.appendChild(tempInput);
+                tempInput.value = dummyLink;
+                tempInput.select();
+                document.execCommand("copy");
+                document.body.removeChild(tempInput);
+                showToast("Pautan Google Form tempahan Royal Bakery dipotong ke papan klip!");
+            });
+
+            // Modals Google Form Pelajar
+            const formModal = document.getElementById('modal-google-form');
+            const openFormModal = () => {
+                formModal.classList.remove('hidden');
+                formModal.classList.add('flex');
+            };
+            const closeFormModal = () => {
+                formModal.classList.add('hidden');
+                formModal.classList.remove('flex');
+                document.getElementById('student-google-form').reset();
+                document.getElementById('gf-date').value = new Date().toISOString().slice(0, 10);
+            };
+
+            document.getElementById('btn-open-form-modal').addEventListener('click', openFormModal);
+            document.getElementById('btn-view-student-form').addEventListener('click', openFormModal);
+            document.getElementById('btn-close-form-modal').addEventListener('click', closeFormModal);
+            document.getElementById('btn-cancel-form-modal').addEventListener('click', closeFormModal);
+
+            // Borang Akses Pelajar Submission
+            document.getElementById('student-google-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const newSubmission = {
+                    id: `REQ-${new Date().getFullYear()}-${Math.floor(10 + Math.random() * 90)}`,
+                    customer: document.getElementById('gf-student-name').value,
+                    region: document.getElementById('gf-class').value,
+                    category: document.getElementById('gf-material').value,
+                    amount: parseInt(document.getElementById('gf-quantity').value, 10),
+                    status: 'Pending', // Default status permohonan dari Google Form
+                    date: document.getElementById('gf-date').value
+                };
+
+                sampleData.unshift(newSubmission);
+                renderTable();
+                closeFormModal();
+                showToast('Borang pelajar berjaya dihantar & direkodkan dalam pemantauan guru!');
+            });
+
+            // Modal Manual Entry (Guru)
+            const modal = document.getElementById('modal-add');
+            document.getElementById('btn-add-row').addEventListener('click', () => {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            });
+
+            const closeModal = () => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.getElementById('add-form').reset();
+            };
+
+            document.getElementById('btn-close-modal').addEventListener('click', closeModal);
+            document.getElementById('btn-cancel-modal').addEventListener('click', closeModal);
+
+            // Add Record Form Submission Manual
+            document.getElementById('add-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const newRecord = {
+                    id: `REQ-${new Date().getFullYear()}-${Math.floor(10 + Math.random() * 90)}`,
+                    customer: document.getElementById('input-customer').value,
+                    region: document.getElementById('input-region').value,
+                    category: document.getElementById('input-category').value,
+                    amount: parseInt(document.getElementById('input-amount').value, 10),
+                    status: document.getElementById('input-status').value,
+                    date: new Date().toISOString().slice(0, 10)
+                };
+
+                sampleData.unshift(newRecord);
+                renderTable();
+                closeModal();
+                showToast('Rekod manual berjaya ditambah');
+            });
+        });
+    </script>
+</body>
+</html>
